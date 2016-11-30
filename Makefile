@@ -18,4 +18,4 @@ facter: rpm
 	pybot --outputdir $(WORKSPACE)/results/individual/$@ --loglevel DEBUG $@
 
 rebot:
-	rebot $(WORKSPACE)/results/individual/*/*.xml $(WORKSPACE)/results/
+	rebot -o $(WORKSPACE)/results/ -x $(WORKSPACE)/results/report.xml $(WORKSPACE)/results/individual/*/*.xml
