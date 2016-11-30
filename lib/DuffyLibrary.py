@@ -99,7 +99,7 @@ class DuffyLibrary(object):
             rsync_command.append('-rlpt')
             rsync_command.append(os.environ['WORKSPACE'] + '/')
             rsync_command.append(node['ip_address'] + ':ws')
-            rc = run_command(rsync_command).returncode
+            rc = run_command(*rsync_command).returncode
             assert rc == 0, 'Failed to run %s' % rsync_command
 
     def it_returns(self, value):
@@ -122,7 +122,7 @@ class DuffyLibrary(object):
             scp_command.extend(['-o', 'StrictHostKeyChecking=no'])
             scp_command.append(args[0])
             scp_command.append('%s@%s:%s' % ('root', node['ip_address'], args[1]))
-            rc = run_command(scp_command).returncode
+            rc = run_command(*scp_command).returncode
             assert rc == 0, 'Failed to run %s' % scp_command
 
     def _exec_sftp_get_command(self, *args):
@@ -132,7 +132,7 @@ class DuffyLibrary(object):
             scp_command.extend(['-o', 'StrictHostKeyChecking=no'])
             scp_command.append('%s@%s:%s' % ('root', node['ip_address'], args[0]))
             scp_command.append(args[1])
-            rc = run_command(scp_command).returncode
+            rc = run_command(*scp_command).returncode
             assert rc == 0, 'Failed to run %s' % scp_command
 
     def _exec_ssh_command(self, *args):
@@ -145,7 +145,7 @@ class DuffyLibrary(object):
             ssh_command.extend(['-o', 'StrictHostKeyChecking=no'])
             ssh_command.extend(['-l', 'root'])
             ssh_command.extend(args)
-            rc = run_command(ssh_command).returncode
+            rc = run_command(*ssh_command).returncode
             assert rc == 0, 'Failed to run %s' % ssh_command
             exit_codes.append(rc)
         self.exit_codes = exit_codes
