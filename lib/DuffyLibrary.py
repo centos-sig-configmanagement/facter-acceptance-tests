@@ -6,6 +6,7 @@ import os
 import subprocess
 from cicoclient.wrapper import CicoWrapper
 from robot.api.deco import keyword
+from robot.api import logger
 from tempfile import NamedTemporaryFile
 import glob
 
@@ -14,6 +15,14 @@ def single_node(func):
         assert len(suite.nodes) == 1, 'We expected only 1 node. Got: %s.' % len(suite.nodes)
         return func(suite, *args, **kwargs)
     return check_single_node
+
+def run_command(*args):
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = process.communicate()
+    logger.info('stdout of %s: %s' % (args, stdout))
+    logger.info('stderr of %s: %s' % (args, stderr))
+    logger.info('return code of %s: %s' % (args, process.returncode))
+    return process
 
 class DuffyLibrary(object):
 
@@ -70,10 +79,11 @@ class DuffyLibrary(object):
         self.exec_nodes = self.nodes
 
     def i_try_to_run_locally(self, *args):
-        self.exit_codes = [subprocess.call(args)]
+        self.exit_codes = [run_command(*args).returncode]
 
     def i_run_locally(self, *args):
-        subprocess.check_call(args)
+        rc = run_command(*args).returncode
+        assert rc == 0, 'Failed to run %s' % args
 
     def i_run(self, *args):
         self._exec_ssh_command(*args)
@@ -89,7 +99,8 @@ class DuffyLibrary(object):
             rsync_command.append('-rlpt')
             rsync_command.append(os.environ['WORKSPACE'] + '/')
             rsync_command.append(node['ip_address'] + ':ws')
-            subprocess.check_call(rsync_command)
+            rc = run_command(rsync_command).returncode
+            assert rc == 0, 'Failed to run %s' % rsync_command
 
     def it_returns(self, value):
         for code in self.exit_codes:
@@ -111,7 +122,8 @@ class DuffyLibrary(object):
             scp_command.extend(['-o', 'StrictHostKeyChecking=no'])
             scp_command.append(args[0])
             scp_command.append('%s@%s:%s' % ('root', node['ip_address'], args[1]))
-            subprocess.check_call(scp_command)
+            rc = run_command(scp_command).returncode
+            assert rc == 0, 'Failed to run %s' % scp_command
 
     def _exec_sftp_get_command(self, *args):
         for node in self.exec_nodes:
@@ -120,7 +132,8 @@ class DuffyLibrary(object):
             scp_command.extend(['-o', 'StrictHostKeyChecking=no'])
             scp_command.append('%s@%s:%s' % ('root', node['ip_address'], args[0]))
             scp_command.append(args[1])
-            subprocess.check_call(scp_command)
+            rc = run_command(scp_command).returncode
+            assert rc == 0, 'Failed to run %s' % scp_command
 
     def _exec_ssh_command(self, *args):
         exit_codes = []
@@ -132,5 +145,7 @@ class DuffyLibrary(object):
             ssh_command.extend(['-o', 'StrictHostKeyChecking=no'])
             ssh_command.extend(['-l', 'root'])
             ssh_command.extend(args)
-            exit_codes.append(subprocess.call(ssh_command))
+            rc = run_command(ssh_command).returncode
+            assert rc == 0, 'Failed to run %s' % ssh_command
+            exit_codes.append(rc)
         self.exit_codes = exit_codes
