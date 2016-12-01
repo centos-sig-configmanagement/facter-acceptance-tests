@@ -82,8 +82,10 @@ class DuffyLibrary(object):
         self.exit_codes = [run_command(*args).returncode]
 
     def i_run_locally(self, *args):
-        rc = run_command(*args).returncode
+        process = run_command(*args)
+        rc = process.returncode
         assert rc == 0, 'Failed to run %s' % args
+        return process
 
     def i_run(self, *args):
         self._exec_ssh_command(*args)
@@ -101,6 +103,10 @@ class DuffyLibrary(object):
             rsync_command.append(node['ip_address'] + ':ws')
             rc = run_command(*rsync_command).returncode
             assert rc == 0, 'Failed to run %s' % rsync_command
+
+    def i_download_rpm_files_from_a_cbs_output(self, process):
+        lines = process.output
+        print lines
 
     def it_returns(self, value):
         for code in self.exit_codes:

@@ -35,7 +35,8 @@ I prepare the SRPM
 I scratch build the spec file in CBS
     I prepare the SRPM
     ${filename} =   Get Glob File  %{WORKSPACE}/*.src.rpm
-    I run locally   cbs  build  --wait  --scratch  %{BUILDTARGET}   ${filename}
+    ${process} =    I run locally   cbs  build  --wait  --scratch  %{BUILDTARGET}   ${filename}
+    I download RPM files from a cbs output       ${process}
     I run locally   rm   ${filename}
     I run   rm -rf SRPMS
 
