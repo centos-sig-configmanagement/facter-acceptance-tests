@@ -16,8 +16,8 @@ def single_node(func):
         return func(suite, *args, **kwargs)
     return check_single_node
 
-def run_command(*args):
-    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def run_command(*args, **kwargs):
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs)
     process.stdout, process.stderr = process.communicate()
     logger.info('stdout of %s: %s' % (args, process.stdout))
     logger.info('stderr of %s: %s' % (args, process.stderr))
@@ -78,8 +78,8 @@ class DuffyLibrary(object):
     def on_the_duffy_nodes(self):
         self.exec_nodes = self.nodes
 
-    def i_try_to_run_locally(self, *args):
-        self.exit_codes = [run_command(*args).returncode]
+    def i_try_to_run_locally(self, *args, **kwargs):
+        self.exit_codes = [run_command(*args, **kwargs).returncode]
 
     def i_run_locally(self, *args):
         process = run_command(*args)
@@ -104,9 +104,11 @@ class DuffyLibrary(object):
             rc = run_command(*rsync_command).returncode
             assert rc == 0, 'Failed to run %s' % rsync_command
 
-    def i_download_rpm_files_from_a_cbs_output(self, process):
+    def get_task_id_from_a_cbs_output(self, process):
         lines = process.stdout
-        print lines
+        for l in lines.split('\n'):
+            if l.startswith('Created task:'):
+                return l.split(' ')[2]
 
     def it_returns(self, value):
         for code in self.exit_codes:
