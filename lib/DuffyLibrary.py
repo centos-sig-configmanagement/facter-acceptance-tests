@@ -18,9 +18,9 @@ def single_node(func):
 
 def run_command(*args):
     process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = process.communicate()
-    logger.info('stdout of %s: %s' % (args, stdout))
-    logger.info('stderr of %s: %s' % (args, stderr))
+    process.stdout, process.stderr = process.communicate()
+    logger.info('stdout of %s: %s' % (args, process.stdout))
+    logger.info('stderr of %s: %s' % (args, process.stderr))
     logger.info('return code of %s: %s' % (args, process.returncode))
     return process
 
