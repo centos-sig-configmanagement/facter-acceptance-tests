@@ -105,7 +105,7 @@ class DuffyLibrary(object):
             assert rc == 0, 'Failed to run %s' % rsync_command
 
     def i_download_rpm_files_from_a_cbs_output(self, process):
-        lines = process.output
+        lines = process.stdout
         print lines
 
     def it_returns(self, value):
