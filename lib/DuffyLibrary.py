@@ -81,8 +81,8 @@ class DuffyLibrary(object):
     def i_try_to_run_locally(self, *args, **kwargs):
         self.exit_codes = [run_command(*args, **kwargs).returncode]
 
-    def i_run_locally(self, *args):
-        process = run_command(*args)
+    def i_run_locally(self, *args, **kwargs):
+        process = run_command(*args, **kwargs)
         rc = process.returncode
         assert rc == 0, 'Failed to run %s' % args
         return process
