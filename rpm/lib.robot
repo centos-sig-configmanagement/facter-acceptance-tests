@@ -37,9 +37,9 @@ I scratch build the spec file in CBS
     ${filename} =   Get Glob File  %{WORKSPACE}/*.src.rpm
     ${process} =    I run locally   cbs  build  --wait  --scratch  %{BUILDTARGET}   ${filename}
     ${taskid} =     Get Task ID From a CBS Output       ${process}
-    I run locally   mkdir ${WORKSPACE}/localrepo
-    I run locally   cbs     download-task   ${taskid}       cwd=${WORKSPACE}/localrepo
-    I run locally   createrepo_c    .       cwd=${WORKSPACE}/localrepo
+    I run locally   mkdir %{WORKSPACE}/localrepo
+    I run locally   cbs     download-task   ${taskid}       cwd=%{WORKSPACE}/localrepo
+    I run locally   createrepo_c    .       cwd=%{WORKSPACE}/localrepo
     I run locally   rm   ${filename}
     I run   rm -rf SRPMS
 
